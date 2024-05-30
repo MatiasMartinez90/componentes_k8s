@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: #{name}#-#{env}#-service
+  namespace: #{namespace}#-#{env}#
+spec:
+  selector:
+    app: #{name}#-#{env}#
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

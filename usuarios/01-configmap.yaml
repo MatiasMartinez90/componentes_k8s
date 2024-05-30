@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apache-config
+  namespace: #{namespace}#-#{env}#
+  labels:
+    k8s-app: #{name}#
+data:
+  000-default.conf: |-
+    <VirtualHost *:80>
+        ServerAdmin webmaster@tata.com.uy
+        ServerName usuarios.tata.com.uy
+        ServerAlias usuarios.tata.com.uy  
+
+        DocumentRoot /var/www/html/ 
+
+        DirectoryIndex index.php
+
+        <Directory />
+            Options FollowSymLinks
+            AllowOverride None
+        </Directory>
+
+        
+        <Directory /var/www/html/>
+            Options FollowSymLinks MultiViews
+            AllowOverride All
+            Order allow,deny
+            allow from all
+        </Directory>
+    </VirtualHost>
+
+    ErrorLog ${APACHE_LOG_DIR}/usuarios.error.log
+    CustomLog ${APACHE_LOG_DIR}/usuarios.access.log combined
+---

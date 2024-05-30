@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: #{name}#
+  name: #{name}#
+  namespace: #{namespace}#-#{env}#
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: #{name}#
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: #{name}#
+    spec:
+      containers:
+      - name: #{name}#
+        args:
+        - php artisan config:cache; /usr/sbin/apachectl '-D' 'FOREGROUND'
+        command:
+        - /bin/sh
+        - -c
+        env:
+        - name: TZ
+          value: "America/Montevideo"
+        image: #{registry}#/#{image-name}#-#{env}#:#{Build.BuildId}#
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          limits:
+            cpu: #{cpu-lim}#
+            memory: #{mem-lim}#
+          requests:
+            cpu: #{cpu-req}#
+            memory: #{mem-req}#
+        volumeMounts:
+        - name: apache-config
+          mountPath: /etc/apache2/sites-available/000-default.conf
+          readOnly: true
+          subPath: 000-default.conf
+        - name: apache-config
+          mountPath: /etc/apache2/sites-enabled/000-default.conf
+          readOnly: true
+          subPath: 000-default.conf
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 0
+      imagePullSecrets:
+      - name: registry-tata
+      volumes:
+      - name: apache-config
+        configMap:
+          defaultMode: 0640
+          name: apache-config
+---
